@@ -26,7 +26,7 @@ void setup() {
   pinMode(BUTTON_C, INPUT_PULLUP);
 
   // text display tests
-  display.setTextSize(2);
+  display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0,0);
 
@@ -36,7 +36,9 @@ void setup() {
   display.display();
 
   // Initialize client
-  tamaService.begin();  
+  tamaService.begin();
+  txService.begin();
+  rxService.begin();
 }
 
 void loop() {
