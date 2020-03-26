@@ -11,15 +11,15 @@ Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, &Wire);
 #define BUTTON_C 27
 
 BLEClientService tamaService = BLEClientService(0xFFF0);
-BLEClientCharacteristic txService = BLEClientCharacteristic(0xFFF2);
+BLECharacteristic txService = BLECharacteristic(0xFFF2);
 BLEClientCharacteristic rxService = BLEClientCharacteristic(0xFFF1);
 
 void setup() {
-  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // Address 0x3C for 128x32
-  // Clear the buffer.
   display.clearDisplay();
   display.display();
+
+  Serial.begin(9600);
 
   pinMode(BUTTON_A, INPUT_PULLUP);
   pinMode(BUTTON_B, INPUT_PULLUP);
@@ -34,13 +34,16 @@ void setup() {
   Bluefruit.setName("Tama-Tamper");
   display.print("ble whore");
   display.display();
-
+  Serial.print("Initalizing...");
   // Initialize client
   tamaService.begin();
+  txService.setProperties(CHR_PROPS_WRITE);
+  txService.setPermission(SECMODE_OPEN, SECMODE_OPEN);
+  txService.setMaxLen(512);
   txService.begin();
   rxService.setNotifyCallback(rx_notify_callback);
   rxService.begin();
-
+  Serial.print("Starting Central...");
   // Callbacks for Central
   Bluefruit.Central.setDisconnectCallback(disconnect_callback);
   Bluefruit.Central.setConnectCallback(connect_callback);
@@ -48,7 +51,7 @@ void setup() {
   Bluefruit.Scanner.setRxCallback(scan_callback);
   Bluefruit.Scanner.restartOnDisconnect(true);
   Bluefruit.Scanner.setInterval(160, 80); // in unit of 0.625 ms
-  Bluefruit.Scanner.filterUuid(tamaService.uuid);
+  Bluefruit.Scanner.filterRssi(-50);
   Bluefruit.Scanner.useActiveScan(false);
   Bluefruit.Scanner.start(0);                   // // 0 = Don't stop scanning after n seconds
 }
@@ -90,50 +93,44 @@ void scan_callback(ble_gap_evt_adv_report_t* report)
 
 /**
  * Callback invoked when an connection is established
- * @param conn_handle
  */
 void connect_callback(uint16_t conn_handle)
 {
   Serial.println("Connected");
-  Serial.print("Discovering HRM Service ... ");
+  Serial.print("Discovering Tama Service ... ");
 
-  // If HRM is not found, disconnect and return
+  // If not found, disconnect and return
   if ( !tamaService.discover(conn_handle) )
   {
     Serial.println("Found NONE");
 
-    // disconnect since we couldn't find HRM service
+    // disconnect since we couldn't find service
     Bluefruit.disconnect(conn_handle);
 
     return;
   }
 
-  // Once HRM service is found, we continue to discover its characteristic
+  // Once service is found, we continue to discover its characteristic
   Serial.println("Found it");
   
-  Serial.print("Discovering Measurement characteristic ... ");
+  Serial.print("Discovering RX characteristic ... ");
   if ( !rxService.discover() )
   {
     // Measurement chr is mandatory, if it is not found (valid), then disconnect
     Serial.println("not found !!!");  
-    Serial.println("Measurement characteristic is mandatory but not found");
+    Serial.println("Measurement RX is mandatory but not found");
     Bluefruit.disconnect(conn_handle);
     return;
   }
   Serial.println("Found it");
 
-  // Measurement is found, continue to look for option Body Sensor Location
-  // https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.body_sensor_location.xml
-  // Body Sensor Location is optional, print out the location in text if present
-  Serial.print("Discovering Body Sensor Location characteristic ... ");
-  
   // Reaching here means we are ready to go, let's enable notification on measurement chr
   if ( rxService.enableNotify() )
   {
-    Serial.println("Ready to receive HRM Measurement value");
+    Serial.println("Ready to receive values");
   }else
   {
-    Serial.println("Couldn't enable notify for HRM Measurement. Increase DEBUG LEVEL for troubleshooting");
+    Serial.println("Couldn't enable. Increase DEBUG LEVEL for troubleshooting");
   }
 }
 
