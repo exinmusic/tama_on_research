@@ -11,8 +11,8 @@ Adafruit_SSD1306 display = Adafruit_SSD1306(128, 32, &Wire);
 #define BUTTON_C 27
 
 BLEClientService tamaService = BLEClientService(0xFFF0);
-BLECharacteristic txService = BLECharacteristic(0xFFF2);
-BLEClientCharacteristic rxService = BLEClientCharacteristic(0xFFF1);
+BLEClientCharacteristic txChar = BLEClientCharacteristic(0xFFF2);
+BLEClientCharacteristic rxChar = BLEClientCharacteristic(0xFFF1);
 
 void setup() {
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // Address 0x3C for 128x32
@@ -37,13 +37,10 @@ void setup() {
   Serial.print("Initalizing...");
   // Initialize client
   tamaService.begin();
-  txService.setProperties(CHR_PROPS_WRITE);
-  txService.setPermission(SECMODE_OPEN, SECMODE_OPEN);
-  txService.setMaxLen(512);
-  txService.begin();
-  rxService.setNotifyCallback(rx_notify_callback);
-  rxService.begin();
-  Serial.print("Starting Central...");
+  txChar.begin();
+  rxChar.setNotifyCallback(rx_notify_callback);
+  rxChar.begin();
+  Serial.print("Starting Central... ");
   // Callbacks for Central
   Bluefruit.Central.setDisconnectCallback(disconnect_callback);
   Bluefruit.Central.setConnectCallback(connect_callback);
@@ -67,7 +64,7 @@ void loop() {
 
 void rx_notify_callback(BLEClientCharacteristic* chr, uint8_t* data, uint16_t len)
 {
-  Serial.print("HRM Measurement: ");
+  Serial.print("<------ ");
 
   if ( data[0] & bit(0) )
   {
@@ -114,20 +111,34 @@ void connect_callback(uint16_t conn_handle)
   Serial.println("Found it");
   
   Serial.print("Discovering RX characteristic ... ");
-  if ( !rxService.discover() )
+  if ( !rxChar.discover() )
   {
-    // Measurement chr is mandatory, if it is not found (valid), then disconnect
+    // chr is mandatory, if it is not found (valid), then disconnect
     Serial.println("not found !!!");  
-    Serial.println("Measurement RX is mandatory but not found");
+    Serial.println("RX is mandatory but not found");
+    Bluefruit.disconnect(conn_handle);
+    return;
+  }
+  Serial.println("Found it");
+
+  Serial.print("Discovering TX characteristic ... ");
+  if ( !txChar.discover() )
+  {
+    // chr is mandatory, if it is not found (valid), then disconnect
+    Serial.println("not found !!!");  
+    Serial.println("TX is mandatory but not found");
     Bluefruit.disconnect(conn_handle);
     return;
   }
   Serial.println("Found it");
 
   // Reaching here means we are ready to go, let's enable notification on measurement chr
-  if ( rxService.enableNotify() )
+  if ( rxChar.enableNotify() )
   {
     Serial.println("Ready to receive values");
+
+    Serial.println("Writing to Tama Service");
+    txChar.write("1",1);
   }else
   {
     Serial.println("Couldn't enable. Increase DEBUG LEVEL for troubleshooting");
