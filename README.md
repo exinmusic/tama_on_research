@@ -1,3 +1,3 @@
 # Talk to modern Tamagotchis w/ Standard BLE Libraries
 
-This software proves that the Tamagotchi ON uses vanilla BLE, and demos this using Python.
+Software as a proof that the Tamagotchi ON uses vanilla BLE and replay attacks are possible. Demo currently in Python.
