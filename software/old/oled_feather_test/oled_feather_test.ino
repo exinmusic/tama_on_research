@@ -14,8 +14,6 @@ BLEClientService tamaService = BLEClientService(0xFFF0);
 BLEClientCharacteristic txChar = BLEClientCharacteristic(0xFFF2);
 BLEClientCharacteristic rxChar = BLEClientCharacteristic(0xFFF1);
 
-const char* handshake = "f08d54414d41474f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020100001700000000007c68489775a64e9900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000104ad05f0cdf08e0d";
-
 void setup() {
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // Address 0x3C for 128x32
   display.clearDisplay();
@@ -67,24 +65,8 @@ void loop() {
 void rx_notify_callback(BLEClientCharacteristic* chr, uint8_t* data, uint16_t len)
 {
   Serial.print("<------ ");
-
-  if ( data[0] & bit(0) )
-  {
-    uint16_t value;
-    memcpy(&value, data+1, 2);
-
-    Serial.println(value);
-  }
-  else
-  {
-    Serial.println(data[1]);
-  }
 }
 
-/**
- * Callback invoked when scanner pick up an advertising data
- * @param report Structural advertising data
- */
 void scan_callback(ble_gap_evt_adv_report_t* report)
 {
   Bluefruit.Central.connect(report);
@@ -138,25 +120,10 @@ void connect_callback(uint16_t conn_handle)
   if ( rxChar.enableNotify() )
   {
     Serial.println("Ready to receive values");
-
     Serial.println("Shaking hands with this wreched thing... ");
-    txChar.write("", 0);
-    txChar.write("f08d", 4);
-    txChar.write("54414d41474f0000000000000000000000000000", 40);
-    txChar.write("0000000000000000000000000000000000000000", 40);
-    txChar.write("0000000000000000000000000000000000000000", 40);
-    txChar.write("0000000000000000000000000201000017000000", 40);
-    txChar.write("00007c68489775a64e9900000000000000000000", 40);
-    txChar.write("0000000000000000000000000000000000000000", 40);
-    txChar.write("0000000000000000000000000000000000000000", 40);
-    txChar.write("0000000000000000000000000000000000000000", 40);
-    txChar.write("0000000000000000000000000000000000000000", 40);
-    txChar.write("0000000000000000000000000000000000000000", 40);
-    txChar.write("0000000000000000000000000000000000000000", 40);
-    txChar.write("0000000000000000000000000000000000000000", 40);
-    txChar.write("00000000000000000000000010000104ad05", 36);
-    txChar.write("f0cd", 4);
-    txChar.write("f08e0d", 6);
+    byte message1[] = {0xf0,0x8d};
+    txChar.write(message1, sizeof(message1));
+    Serial.print(message1);
   }else
   {
     Serial.println("Couldn't enable. Increase DEBUG LEVEL for troubleshooting");
