@@ -8,15 +8,23 @@ buttonB = digitalio.DigitalInOut(board.D24)
 buttonA.switch_to_input()
 buttonB.switch_to_input()
 
+def now():
+    status = None
+    if buttonB.value and not buttonA.value:  # button A pressed
+        status = "a"
+    if buttonA.value and not buttonB.value:  # button B pressed
+        status = "b"
+    if not buttonA.value and not buttonB.value:  # both pressed
+        status = 'ab'
+    return status
+
 oled.backlight.value = True
 
 if __name__ == "__main__":
     while True:
-        if buttonB.value and not buttonA.value:  # just button A pressed
+        if now() == 'a':
             oled.print_text('A!', '#FF0000')
-            print("A")
-        if buttonA.value and not buttonB.value:  # just button B pressed
+        if now() == 'b':
             oled.print_text('B!', '#00FF00')
-            print("B")
-        if not buttonA.value and not buttonB.value:  # none pressed
-            oled.print_text('WHAT DO YOU WANT FROM ME?', '#0000FF')
+        if now() == 'ab':
+            oled.print_text('make up your mind.', '#0000FF')
