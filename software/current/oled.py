@@ -3,7 +3,7 @@ import board
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_rgb_display.st7789 as st7789
 
-# Create ST7789 display:
+# ST7789 DISPLAY:
 disp = st7789.ST7789(
     board.SPI(),
     cs=digitalio.DigitalInOut(board.CE0),
@@ -16,7 +16,7 @@ disp = st7789.ST7789(
     y_offset=80,
 )
 
-# UTILS
+# VARIABLES
 height = disp.width 
 width = disp.height
 image = Image.new("RGB", (width, height))
@@ -47,15 +47,21 @@ def sized_img(image_name):
     image = image.crop((x, y, x + width, y + height))
     return image
 
-#Display text
-def print_text(text_input, text_color):
+def print_text(text_input:str, text_color:str)->None:
+    '''
+    Writes out a string on the oled screen.
+    Second argument is a hex color value for the text.
+    '''
     draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
     y = top
     draw.text((0, y), text_input, font=font, fill=text_color)
     disp.image(image, rotation)
 
 #Display image
-def display_image(img_name):
+def display_image(img_name:str)->None:
+    '''
+    Displays an image on the oled screen.
+    '''
     disp.image(sized_img(img_name), rotation)
 
 
