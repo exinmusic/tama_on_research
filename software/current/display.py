@@ -44,7 +44,7 @@ def sized_img(image_name):
     # Crop and center the image
     x = scaled_width // 2 - width // 2
     y = scaled_height // 2 - height // 2
-    image = image.crop((0, y, 0 + width, y + height))
+    image = image.crop((x, y, x + width, y + height))
     return image
 
 #Display text
