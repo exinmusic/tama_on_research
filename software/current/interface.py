@@ -8,6 +8,8 @@ buttonB = digitalio.DigitalInOut(board.D24)
 buttonA.switch_to_input()
 buttonB.switch_to_input()
 
+oled.backlight.value = True
+
 if __name__ == "__main__":
     while True:
         if buttonB.value and not buttonA.value:  # just button A pressed
