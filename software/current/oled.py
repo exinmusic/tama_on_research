@@ -70,9 +70,14 @@ if __name__ == "__main__":
     sleep(2)
 
     # Display image.
-    display_image('blinka.jpg')
+    display_image('kustama.jpg')
 
     sleep(2)
 
     # display text
     print_text('Good bye cruel world...', '#FF0000')
+
+    sleep(2)
+
+    # Display image.
+    display_image('pic2.jpg')
