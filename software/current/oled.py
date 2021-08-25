@@ -48,7 +48,7 @@ def sized_img(image_name):
     return image
 
 #Display text
-def display_text(text_input, text_color):
+def print_text(text_input, text_color):
     draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
     y = top
     draw.text((0, y), text_input, font=font, fill=text_color)
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     backlight.value = True
 
     # display text
-    display_text('Hello world!', '#00FF00')
+    print_text('Hello world!', '#00FF00')
 
     sleep(2)
 
@@ -75,4 +75,4 @@ if __name__ == "__main__":
     sleep(2)
 
     # display text
-    display_text('Good bye cruel world...', '#FF0000')
+    print_text('Good bye cruel world...', '#FF0000')
