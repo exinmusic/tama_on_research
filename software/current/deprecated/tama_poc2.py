@@ -1,6 +1,8 @@
 import time
 from adafruit_ble import BLERadio
 from ble_services import TAMAService
+
+import subprocess
 import digitalio
 import board
 from PIL import Image, ImageDraw, ImageFont
@@ -81,10 +83,6 @@ font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
 backlight = digitalio.DigitalInOut(board.D22)
 backlight.switch_to_output()
 backlight.value = True
-buttonA = digitalio.DigitalInOut(board.D23)
-buttonB = digitalio.DigitalInOut(board.D24)
-buttonA.switch_to_input()
-buttonB.switch_to_input()
 
 img = size_img('blinka.jpg')
 
@@ -92,25 +90,6 @@ img = size_img('blinka.jpg')
 disp.image(img, rotation)
 time.sleep(1)
 # END DISPLAY STUFF
-
-while True:
-    if buttonB.value and not buttonA.value:  # just button A pressed
-        draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
-
-        y = top
-        label= "Sending bitcoin to tama..."
-        draw.text((x, y), label, font=font, fill="#00ff00")
-
-        y += font.getsize(label)[1]
-        label = "Sending bitcoin to tama..."
-        draw.text((x, y), label, font=font, fill="#6ffc03")
-
-        disp.image(image, rotation)
-        
-    if buttonA.value and not buttonB.value:  # just button B pressed
-        display.fill(color565(0, 0, 255))  # blue
-    if not buttonA.value and not buttonB.value:  # none pressed
-        display.fill(color565(0, 255, 0))  # green
 
 ble = BLERadio()
 
@@ -153,7 +132,7 @@ if tama_connection and tama_connection.connected:
 
     time.sleep(1)
 
-    f = open("playback/pwnd.txt", "rb")
+    f = open("playback/new_owned.txt", "rb")
     replay(tama_connection, f)
     f.close()
 
