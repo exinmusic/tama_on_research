@@ -84,7 +84,7 @@ backlight = digitalio.DigitalInOut(board.D22)
 backlight.switch_to_output()
 backlight.value = True
 
-img = size_img('blinka.jpg')
+img = size_img('pic2.jpg')
 
 # Display image.
 disp.image(img, rotation)
