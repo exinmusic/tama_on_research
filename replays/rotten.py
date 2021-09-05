@@ -1,4 +1,4 @@
-with open("tg19_bg42069.txt", "rb") as f:
+with open("tg19_bg50010.txt", "rb") as f:
 	output = ""
 	count1 = 0
 	for line in f.readlines():
@@ -11,7 +11,7 @@ with open("tg19_bg42069.txt", "rb") as f:
 
 print(output)
 
-with open("new_owned.txt", "w") as f2:
+with open("new_owned2.txt", "w") as f2:
 	f2.write(output)
 
 # with open("owned_bg.txt", "r") as f:
