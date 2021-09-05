@@ -132,7 +132,7 @@ if tama_connection and tama_connection.connected:
 
     time.sleep(1)
 
-    f = open("playback/new_owned.txt", "rb")
+    f = open("playback/pwnd.txt", "rb")
     replay(tama_connection, f)
     f.close()
 
